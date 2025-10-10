@@ -18,7 +18,7 @@ async def transcribe(file: UploadFile, provider: str = Form("unknown"), lang: st
 
     decoder = OggOpusDecoder()
     denoiser = NoiseReduceAdapter()
-    stt_engine = WhisperAdapter(model_size="base")
+    stt_engine = WhisperAdapter(model_size="medium")
 
     service = SttService(decoder, denoiser, stt_engine)
     meta = AudioMeta(provider=provider, content_type=file.content_type, lang=lang)

@@ -14,8 +14,8 @@ class SttService:
         wav_clean = self.denoiser.reduce(wav)
         result = self.stt.transcribe(wav_clean, language=meta.lang)
         return TranscriptResult(
-            text=result.text,
-            confidence=result.confidence,
+            text=result,
+            confidence=None,
             language=meta.lang,
             timestamp=datetime.utcnow(),
             provider=meta.provider,
