@@ -21,4 +21,3 @@ class SttService:
             provider=meta.provider,
             original_format=meta.content_type
         )
-
