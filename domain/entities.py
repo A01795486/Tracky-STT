@@ -11,7 +11,7 @@ class AudioMeta:
 @dataclass
 class TranscriptResult:
     text: str
-    confidence: Optional[float]
+    confidence:float
     language: str
     timestamp: datetime
     provider: str
