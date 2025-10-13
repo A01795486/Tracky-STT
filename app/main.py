@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from pydub import AudioSegment
 from fastapi import FastAPI, UploadFile, Form
 from pathlib import Path
@@ -18,19 +19,13 @@ async def transcribe(file: UploadFile, provider: str = Form("unknown"), lang: st
 
     decoder = OggOpusDecoder()
     denoiser = NoiseReduceAdapter()
-    stt_engine = WhisperAdapter(model_size="medium")
+    stt_engine = WhisperAdapter()
 
     service = SttService(decoder, denoiser, stt_engine)
     meta = AudioMeta(provider=provider, content_type=file.content_type, lang=lang)
     result = service.run(tmp, meta)
 
-    return {
-        "timestamp": datetime.utcnow().isoformat(),
-        "provider": result.provider,
-        "original_format": result.original_format,
-        "language": result.language,
-        "text": result.text
-    }
+    return asdict(result)   
 
 @app.get("/health")
 async def health():
