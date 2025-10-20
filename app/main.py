@@ -8,6 +8,7 @@ from adapters.decoder.ogg_opus import OggOpusDecoder
 from adapters.denoise.noisereduce_adapter import NoiseReduceAdapter
 from adapters.stt.whisper_adapter import WhisperAdapter
 from datetime import datetime
+from adapters.decoder.factory import DecoderFactory
 
 
 app = FastAPI(title="Tracky STT")
@@ -17,7 +18,7 @@ async def transcribe(file: UploadFile, provider: str = Form("unknown"), lang: st
     tmp = Path(file.filename)
     tmp.write_bytes(await file.read())
 
-    decoder = OggOpusDecoder()
+    decoder = DecoderFactory.get(provider)
     denoiser = NoiseReduceAdapter()
     stt_engine = WhisperAdapter()
 
@@ -25,7 +26,7 @@ async def transcribe(file: UploadFile, provider: str = Form("unknown"), lang: st
     meta = AudioMeta(provider=provider, content_type=file.content_type, lang=lang)
     result = service.run(tmp, meta)
 
-    return asdict(result)   
+    return asdict(result)
 
 @app.get("/health")
 async def health():

@@ -1,0 +1,8 @@
+{
+    "python.defaultInterpreterPath": "A:\\Development\\ProyectoIntegrador-STT\\venv\\Scripts\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.extraPaths": [
+        "A:\\Development\\ProyectoIntegrador-STT"
+    ],
+    "python-envs.pythonProjects": []
+}
