@@ -30,7 +30,7 @@ def create_provider_audio(provider: str, text: str):
     if provider in ["whatsapp", "telegram"]:
         audio.export(final_path, format="ogg", codec="libopus")
     elif provider in ["teams", "messenger"]:
-        audio.export(final_path, format="ipod")  # AAC
+        audio.export(final_path, format="ipod")  
     else:
         audio = audio.set_frame_rate(16000).set_channels(1)
         audio.export(final_path, format="wav")
