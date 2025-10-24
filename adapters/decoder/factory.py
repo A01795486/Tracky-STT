@@ -20,10 +20,6 @@ class DecoderFactory:
             print("Usando decoder para Web (WAV 16 kHz).")
             return WavDecoder()
 
-        elif provider in ["PBX", "VOIP", "PHONE"]:
-            print("[Usando decoder para PBX (WAV 8 kHz).")
-            return WavDecoder()
-
         else:
             print(f"Proveedor no reconocido: {provider}. Usando OggOpusDecoder por defecto.")
             return OggOpusDecoder()
