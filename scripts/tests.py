@@ -21,8 +21,8 @@ def generate_tts_audio(text: str, out_path: Path):
 
 def create_provider_audio(provider: str, text: str):
     wav_path = BASE_DIR / f"{provider}.wav"
-    final_path = BASE_DIR / f"{provider}.ogg" if provider in ["whatsapp", "telegram"] else (
-                 BASE_DIR / f"{provider}.m4a" if provider in ["teams", "messenger"] else wav_path)
+    final_path = BASE_DIR / f"{provider}.ogg" if provider in ["whatsapp", "teams"] else (
+                 BASE_DIR / f"{provider}.m4a" if provider in ["telegram", "messenger"] else wav_path)
 
     generate_tts_audio(text, wav_path)
     audio = AudioSegment.from_wav(wav_path)
