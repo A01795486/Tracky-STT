@@ -1,4 +1,5 @@
-# app/main.py
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, Form, HTTPException
 from pathlib import Path
 from dataclasses import asdict
@@ -10,8 +11,9 @@ from adapters.denoise.noisereduce_adapter import NoiseReduceAdapter
 from adapters.stt.stt_factory import STTFactory
 from adapters.input.input_manager import InputManager
 
-
+load_dotenv()
 app = FastAPI(title="Tracky STT")
+
 
 @app.post("/transcribe")
 async def transcribe(
@@ -19,11 +21,9 @@ async def transcribe(
     audio_url: str = Form(None),
     audio_base64: str = Form(None),
     provider: str = Form("unknown"),
-    lang: str = Form("es"),
-    #stt_engine: str = Form("whisper")  
+    lang: str = Form("es-MX"),
+    stt_engine: str = Form("azure")  
 ):
-
-
     input_manager = InputManager(tmp_dir="./tmp")
 
     try:
@@ -33,9 +33,11 @@ async def transcribe(
 
     decoder = DecoderFactory.get(provider)
     denoiser = NoiseReduceAdapter()
-    stt_adapter = STTFactory.get('whisper') 
+    stt_adapter = STTFactory.get(stt_engine) 
 
-
+    if "-" not in lang:
+        lang = f"{lang}-MX"
+    
     service = SttService(decoder, denoiser, stt_adapter)
     meta = AudioMeta(
         provider=provider,
@@ -49,5 +51,8 @@ async def transcribe(
 
 @app.get("/health")
 async def health():
-    """Verifica que el servicio está corriendo."""
-    return {"status": "ok", "service": "Tracky STT", "uptime": datetime.utcnow().isoformat()}
+     return {
+        "status": "ok",
+        "service": "Tracky STT",
+        "uptime": datetime.utcnow().isoformat()
+    }
