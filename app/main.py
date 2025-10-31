@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, Form, HTTPException, Query
+from dataclasses import asdict
 from datetime import datetime
 from domain.entities import AudioMeta
 from domain.service import SttService
@@ -9,9 +10,8 @@ from adapters.stt.stt_factory import STTFactory
 from adapters.input.input_manager import InputManager
 from adapters.out.json_adapter import JsonResponseAdapter
 
-
 load_dotenv()
-app = FastAPI(title="Tracky STT")
+app = FastAPI(title="Tracky STT API")
 
 
 @app.post("/transcribe")
@@ -21,59 +21,47 @@ async def transcribe(
     audio_base64: str = Form(None),
     provider: str = Form("unknown"),
     lang: str = Form("es-MX"),
-    stt_engine: str = Form("whisper"),
+    stt_engine: str = Form("azure"),
     mode: str = Query("compact", description="Modo de salida: compact o full")
 ):
     """
-    Endpoint principal de transcripción de audio.
-
-    Permite enviar un archivo, URL o Base64 para su transcripción.
-    Devuelve un resultado estructurado en modo compacto o completo.
-
-    Argumentos:
-        file: Archivo de audio cargado.
-        audio_url: URL remota de un audio.
-        audio_base64: Audio en cadena Base64.
-        provider: Fuente del audio (WhatsApp, Teams, etc.).
-        lang: Idioma para la transcripción (por defecto 'es-MX').
-        stt_engine: Motor STT a usar ('azure', 'whisper', 'google').
-        mode: Nivel de detalle del resultado ('compact' o 'full').
-
-    Retorna:
-        dict: Resultado serializado del proceso de transcripción.
+    Endpoint principal de transcripción.
+    Recibe audio desde múltiples fuentes (archivo, URL o Base64),
+    detecta automáticamente el formato y devuelve el resultado normalizado.
     """
+    input_manager = InputManager(tmp_dir="./tmp")
+
     try:
-        tmp = InputManager("./tmp").process_input(file, audio_url, audio_base64)
+        input_data = input_manager.process_input(
+            file=file, audio_url=audio_url, audio_base64=audio_base64
+        )
     except HTTPException as e:
         return {"error": e.detail}
 
     decoder = DecoderFactory.get(
-    provider=provider,
-    file_path=tmp,
-    mime_type=file.content_type if file else ""
+        provider=provider,
+        file_path=input_data["path"],
+        mime_type=input_data["mime_type"]
     )
 
     denoiser = NoiseReduceAdapter()
-    stt = STTFactory.get(stt_engine)
-    service = SttService(decoder, denoiser, stt)
+    stt_adapter = STTFactory.get(stt_engine)
 
+    service = SttService(decoder, denoiser, stt_adapter)
     meta = AudioMeta(
         provider=provider,
-        content_type=file.content_type if file else "url/base64",
-        lang=lang if "-" in lang else f"{lang}-MX"
+        content_type=input_data["mime_type"],
+        lang=lang
     )
 
-    result = service.run(tmp, meta)
-    return JsonResponseAdapter.serialize(result, mode)
+    result = service.run(input_data["path"], meta)
+    return JsonResponseAdapter.serialize(result, mode=mode)
 
 
 @app.get("/health")
 async def health():
     """
-    Verifica el estado de la API Tracky STT.
-
-    Retorna:
-        dict: Estado general del servicio.
+    Endpoint de verificación de estado del servicio.
     """
     return {
         "status": "ok",
