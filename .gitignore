@@ -2,3 +2,4 @@ config.local.json
 .env
 __pycache__/
 tmp/
+credentials/

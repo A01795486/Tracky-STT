@@ -2,7 +2,12 @@
     "python.defaultInterpreterPath": "A:\\Development\\ProyectoIntegrador-STT\\venv\\Scripts\\python.exe",
     "python.terminal.activateEnvironment": true,
     "python.analysis.extraPaths": [
-        "A:\\Development\\ProyectoIntegrador-STT"
+        "A:\\Development\\ProyectoIntegrador-STT",
+        "A:\\Development\\ProyectoIntegrador-STT\\venv\\Lib\\site-packages"
     ],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none"
+    },
+    "python.languageServer": "Pylance",
     "python-envs.pythonProjects": []
 }
