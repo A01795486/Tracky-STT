@@ -11,6 +11,7 @@ from adapters.input.input_manager import InputManager
 from adapters.out.json_adapter import JsonResponseAdapter
 
 load_dotenv()
+SAVE_INPUT_FILES = False
 app = FastAPI(title="Tracky STT API")
 
 
@@ -21,7 +22,7 @@ async def transcribe(
     audio_base64: str = Form(None),
     provider: str = Form("unknown"),
     lang: str = Form("es-MX"),
-    stt_engine: str = Form("azure"),
+    stt_engine: str = Form("google"),
     mode: str = Query("compact", description="Modo de salida: compact o full")
 ):
     """
@@ -29,7 +30,7 @@ async def transcribe(
     Recibe audio desde múltiples fuentes (archivo, URL o Base64),
     detecta automáticamente el formato y devuelve el resultado normalizado.
     """
-    input_manager = InputManager(tmp_dir="./tmp")
+    input_manager = InputManager(tmp_dir="./tmp", save_files=SAVE_INPUT_FILES)
 
     try:
         input_data = input_manager.process_input(
@@ -68,3 +69,5 @@ async def health():
         "service": "Tracky STT",
         "uptime": datetime.utcnow().isoformat()
     }
+
+
