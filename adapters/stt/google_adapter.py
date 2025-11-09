@@ -5,7 +5,7 @@ from domain.entities import TranscriptResult
 from pathlib import Path
 from datetime import datetime
 import os
-
+from google.protobuf.json_format import MessageToDict
 
 class GoogleSTTAdapter(TranscriberPort):
     """
@@ -44,7 +44,8 @@ class GoogleSTTAdapter(TranscriberPort):
                     language=language,
                     timestamp=datetime.utcnow(),
                     provider="google",
-                    original_format=str(wav_path.suffix)
+                    original_format=str(wav_path.suffix),
+                    raw={"error": "No transcription results found."}
                 )
 
             result = response.results[0].alternatives[0]
@@ -54,7 +55,8 @@ class GoogleSTTAdapter(TranscriberPort):
                 language=language,
                 timestamp=datetime.utcnow(),
                 provider="google",
-                original_format=str(wav_path.suffix)
+                original_format=str(wav_path.suffix),
+                raw = MessageToDict(response._pb)
             )
 
         except Exception as e:

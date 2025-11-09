@@ -56,6 +56,7 @@ async def transcribe(
     )
 
     result = service.run(input_data["path"], meta)
+    input_manager.cleanup(input_data["path"])
     return JsonResponseAdapter.serialize(result, mode=mode)
 
 
